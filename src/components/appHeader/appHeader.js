@@ -1,23 +1,29 @@
+import { Tabs } from 'antd';
+import './appHeader.css';
+
 export default function AppHeader(props) {
+  const onChange = (key) => {
+    console.log(key);
+  };
+
   return (
     <header className="header">
-      <form>
-        <ul>
-          <li className="active">
-            <label>
-              <input type="radio" />
-              Search
-            </label>
-          </li>
-          <li>
-            <label>
-              <input type="radio" />
-              Rated
-            </label>
-          </li>
-        </ul>
-        <input className="search-line" placeholder="What film are you looking for?" />
-      </form>
+      <Tabs
+        className="tabs"
+        defaultActiveKey="1"
+        onChange={onChange}
+        items={[
+          {
+            label: 'Search',
+            key: 'search',
+          },
+          {
+            label: 'Rated',
+            key: 'rated',
+          },
+        ]}
+        size="large"
+      />
     </header>
   );
 }

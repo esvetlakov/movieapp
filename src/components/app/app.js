@@ -3,6 +3,7 @@ import { Component } from 'react';
 import CreateCard from '../createCard/createCard';
 import AppHeader from '../appHeader/appHeader';
 import AppFooter from '../appFooter/appFooter';
+import fetchData from '../fetchData/fetchData';
 
 export default class App extends Component {
   state = {
