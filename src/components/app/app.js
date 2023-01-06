@@ -18,7 +18,7 @@ export default class App extends Component {
         filmName: 'Your Name 2',
         releaseDate: 'Sep 13, 2013',
         genres: ['Action', 'Drama', 'Anime'],
-        description: '',
+        description: 'test testtesttest test testtest testtesttest test testtesttesttest test test testtesttest',
       },
     ],
   };
@@ -28,7 +28,7 @@ export default class App extends Component {
     return (
       <section className="main">
         <AppHeader />
-        <CreateCard filmsData={filmsData} />
+        <CreateCard filmsData={filmsData[1]} />
         <AppFooter />
       </section>
     );
