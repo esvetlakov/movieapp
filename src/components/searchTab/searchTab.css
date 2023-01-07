@@ -1,16 +1,15 @@
 .searchTab {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 90%;
+    align-items: center;
+    background-color: white;
 }
 
-.filmSearch {
-    margin: 0 auto;
-    width: 70%;
+.input {
+    margin: 10px 50px 35px 50px;
+    width: calc(100% - 100px)
 }
 
 .pagination {
-    margin: 0 auto;
-    width: 30%;
- }
+    margin-top: 35px;
+}
