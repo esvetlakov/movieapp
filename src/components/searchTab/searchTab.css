@@ -1,0 +1,16 @@
+.searchTab {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 90%;
+}
+
+.filmSearch {
+    margin: 0 auto;
+    width: 70%;
+}
+
+.pagination {
+    margin: 0 auto;
+    width: 30%;
+ }
