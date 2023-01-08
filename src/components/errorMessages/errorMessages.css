@@ -1,0 +1,7 @@
+.error {
+    position: absolute;
+    z-index: 100;
+    top: 20px;
+    right: 20px;
+    padding: 8px !important;
+}

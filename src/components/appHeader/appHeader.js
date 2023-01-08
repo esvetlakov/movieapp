@@ -1,7 +1,7 @@
 import { Tabs } from 'antd';
 import './appHeader.css';
 
-export default function AppHeader(props) {
+export default function AppHeader() {
   const onChange = (key) => {
     console.log(key);
   };

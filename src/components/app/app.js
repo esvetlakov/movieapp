@@ -3,8 +3,8 @@ import { format, parseISO } from 'date-fns';
 
 import SearchTab from '../searchTab/searchTab';
 import AppHeader from '../appHeader/appHeader';
-import AppFooter from '../appFooter/appFooter';
 import MovieAPI from '../../api/movieAPI';
+import ErrorMessages from '../errorMessages/errorMessages';
 
 export default class App extends Component {
   api = new MovieAPI();
@@ -19,11 +19,31 @@ export default class App extends Component {
   state = {
     filmsData: [],
     currentPage: [],
+    loading: false,
+    isLoaded: false,
+    error: false,
+    notFound: false,
   };
 
   componentDidMount() {
-    this.searchFilms();
+    this.searchFilms('marvel');
   }
+
+  onFilmsLoaded(films) {
+    this.setState({
+      filmsData: films,
+      currentPage: films.slice(0, 4),
+      loading: false,
+      isLoaded: true,
+      error: false,
+      notFound: false,
+    });
+  }
+
+  onError = (error) => {
+    this.setState({ error: true });
+    console.log(error);
+  };
 
   getGenresName(ids) {
     const names = [];
@@ -33,6 +53,13 @@ export default class App extends Component {
       }
     });
     return names;
+  }
+
+  static getFilmDate(date) {
+    if (!date) {
+      return 'Release date unknown';
+    }
+    return format(parseISO(date), 'MMMM d, R');
   }
 
   updateFilms = (page) => {
@@ -52,38 +79,43 @@ export default class App extends Component {
     this.setState({ currentPage: newState });
   };
 
-  searchFilms() {
-    this.api.getMovies().then((res) => {
-      const newState = res.map((el) => {
-        const genresNames = this.getGenresName(el.genre_ids);
-        let date;
-        if (!el.release_date) {
-          date = 'Release date unknown';
+  searchFilms = (name) => {
+    this.setState({ loading: true });
+    this.api
+      .getMovies(name)
+      .then((res) => {
+        if (res.length === 0) {
+          this.setState({ filmsData: [], currentPage: [], loading: false, notFound: true });
         } else {
-          date = format(parseISO(el.release_date), 'MMMM d, R');
+          const newState = res.map((el) => ({
+            id: el.id,
+            filmName: el.title,
+            releaseDate: App.getFilmDate(el.release_date),
+            genres: this.getGenresName(el.genre_ids),
+            poster: el.poster_path,
+            description: el.overview,
+            rating: el.vote_average,
+            userRating: null,
+          }));
+          this.onFilmsLoaded(newState);
         }
-        return {
-          id: el.id,
-          filmName: el.title,
-          releaseDate: date,
-          genres: genresNames,
-          poster: el.poster_path,
-          description: el.overview,
-          rating: el.vote_average,
-          userRating: null,
-        };
-      });
-      this.setState({ filmsData: newState, currentPage: newState.slice(0, 4) });
-    });
-  }
+      })
+      .catch(this.onError);
+  };
 
   render() {
-    const { currentPage } = this.state;
+    const { currentPage, loading, isLoaded, error, notFound } = this.state;
     return (
       <section className="main">
+        <ErrorMessages error={error} notFound={notFound} />
         <AppHeader />
-        <SearchTab currentPage={currentPage} updateFilms={this.updateFilms} />
-        <AppFooter />
+        <SearchTab
+          currentPage={currentPage}
+          loading={loading}
+          isLoaded={isLoaded}
+          searchFilms={this.searchFilms}
+          updateFilms={this.updateFilms}
+        />
       </section>
     );
   }

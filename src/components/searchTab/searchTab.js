@@ -1,20 +1,56 @@
-import { Input, Pagination } from 'antd';
+import { Input, Pagination, Spin } from 'antd';
+import { Component } from 'react';
 
 import CreateCard from '../createCard/createCard';
 import './searchTab.css';
 
-export default function SearchTab(props) {
-  const { currentPage, updateFilms } = props;
+export default class SearchTab extends Component {
+  state = {
+    searchValue: '',
+  };
 
-  const onChange = (page) => {
+  paginationOnChange = (page) => {
+    const { updateFilms } = this.props;
     updateFilms(page);
   };
 
-  return (
-    <div className="searchTab">
-      <Input placeholder="Type to search" className="input" />
-      <CreateCard currentPage={currentPage} />
-      <Pagination defaultCurrent={1} total={20} pageSize="4" className="pagination" onChange={onChange} />
-    </div>
-  );
+  inputOnPressEnter = () => {
+    const { searchFilms } = this.props;
+    const { searchValue } = this.state;
+
+    searchFilms(searchValue);
+    this.setState({ searchValue: '' });
+  };
+
+  inputOnChange = (e) => {
+    const { value } = e.target;
+    this.setState({ searchValue: value });
+  };
+
+  render() {
+    const { currentPage, loading, isLoaded } = this.props;
+    const { searchValue } = this.state;
+
+    return (
+      <div className="searchTab">
+        <Input
+          placeholder="Type to search"
+          className="input"
+          value={searchValue}
+          onPressEnter={this.inputOnPressEnter}
+          onChange={this.inputOnChange}
+        />
+        <Spin spinning={loading}>
+          <CreateCard currentPage={currentPage} />
+        </Spin>
+        <Pagination
+          defaultCurrent={1}
+          total={20}
+          pageSize="4"
+          className={!isLoaded ? 'hidden' : 'pagination'}
+          onChange={this.paginationOnChange}
+        />
+      </div>
+    );
+  }
 }

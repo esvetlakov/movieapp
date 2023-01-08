@@ -23,6 +23,7 @@ module.exports = {
     indent: ['error', 2],
     'prettier/prettier': 'error',
     'linebreak-style': [0, 'unix'],
+    'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     quotes: ['error', 'single'],
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',

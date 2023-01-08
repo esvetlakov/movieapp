@@ -7,9 +7,13 @@
 
 .input {
     margin: 10px 50px 35px 50px;
-    width: calc(100% - 100px)
+    width: calc(100% - 70px)
 }
 
 .pagination {
     margin-top: 35px;
+}
+
+.hidden {
+    display: none;
 }

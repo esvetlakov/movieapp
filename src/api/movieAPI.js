@@ -7,16 +7,19 @@ export default class movieAPI {
     const res = await fetch(`${this.apiBase}${url}`);
 
     if (!res.ok) {
-      return <Alert message={`recieved error ${res.status}`} type="error" />;
+      return <Alert message={`recieved error ${res.status}`} type="error" className="error" />;
     }
     return res.json();
   }
 
-  async getMovies() {
+  async getMovies(name) {
+    const query = encodeURI(name);
     const res = await this.getResource(
-      'search/movie?api_key=08f8f1812305145853632c3ae154427c&language=en-US&query=Your%20Name&page=1&include_adult=false'
+      `search/movie?api_key=08f8f1812305145853632c3ae154427c&language=en-US&query=${query}&page=1&include_adult=false`
     );
-    return res.results;
+    const result = res.results;
+
+    return result;
   }
 
   getMovieData(id) {
