@@ -5,7 +5,30 @@ import './createCard.css';
 export default function CreateCard(props) {
   const { Sider } = Layout;
   const { Title, Paragraph, Text } = Typography;
-  const { currentPage } = props;
+  const { filmsData, changeUserRating } = props;
+
+  const genresTags = (genres, id) => genres.map((genre) => <Tag key={`${id}${genre}`}>{genre}</Tag>);
+
+  const posterURL = (poster) => {
+    if (!poster) {
+      return '../../static/noImage.jpg';
+    }
+    return `https://themoviedb.org/t/p/w300_and_h450_bestv2${poster}`;
+  };
+
+  const ratingColor = (rating) => {
+    if (rating < 3) {
+      return '#E90000';
+    }
+    if (rating < 5) {
+      return '#E97E00';
+    }
+    if (rating < 7) {
+      return '#E9D100';
+    }
+    return '#66E900';
+  };
+
   const antIcon = (
     <LoadingOutlined
       style={{
@@ -15,14 +38,10 @@ export default function CreateCard(props) {
     />
   );
 
-  const cards = currentPage.map((film) => {
+  const cards = filmsData.map((film) => {
     const { filmName, description, releaseDate, genres, poster, rating, userRating, id } = film;
-    const genresTags = genres.map((genre) => <Tag key={`${id}${genre}`}>{genre}</Tag>);
-    const posterURL = () => {
-      if (!poster) {
-        return '../../static/noImage.jpg';
-      }
-      return `https://themoviedb.org/t/p/w300_and_h450_bestv2${poster}`;
+    const onRatingChange = (val) => {
+      changeUserRating(id, val);
     };
     return (
       <Layout className="cardWrapper" key={id}>
@@ -30,7 +49,7 @@ export default function CreateCard(props) {
           <Image
             width={183}
             height={279}
-            src={posterURL()}
+            src={posterURL(poster)}
             placeholder={<Spin indicator={antIcon} className="spin" />}
           />
         </Sider>
@@ -44,12 +63,12 @@ export default function CreateCard(props) {
               percent={0}
               format={() => `${rating}`}
               width={40}
-              trailColor="#E9D100"
+              trailColor={ratingColor(rating)}
               className="rating"
             />
           </header>
           <Text className="releaseDate">{releaseDate}</Text>
-          <div className="tags">{genresTags}</div>
+          <div className="tags">{genresTags(genres, id)}</div>
           <Paragraph
             className="description"
             ellipsis={
@@ -61,7 +80,7 @@ export default function CreateCard(props) {
           >
             {description}
           </Paragraph>
-          <Rate count={10} allowHalf defaultValue={userRating} className="userRating" />
+          <Rate count={10} allowHalf defaultValue={userRating} className="userRating" onChange={onRatingChange} />
         </Layout>
       </Layout>
     );

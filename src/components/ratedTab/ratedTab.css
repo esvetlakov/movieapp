@@ -1,13 +1,8 @@
-.searchTab {
+.ratedTab {
+    margin-top: 20px;
     display: flex;
     flex-direction: column;
-    align-items: center;
     background-color: white;
-}
-
-.input {
-    margin: 10px 50px 35px 50px;
-    width: 930px;
 }
 
 .pagination {

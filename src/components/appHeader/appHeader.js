@@ -1,9 +1,11 @@
 import { Tabs } from 'antd';
 import './appHeader.css';
 
-export default function AppHeader() {
+export default function AppHeader(props) {
+  const { changeTab } = props;
+
   const onChange = (key) => {
-    console.log(key);
+    changeTab(key);
   };
 
   return (
@@ -11,6 +13,7 @@ export default function AppHeader() {
       <Tabs
         className="tabs"
         defaultActiveKey="1"
+        destroyInactiveTabPane={true}
         onChange={onChange}
         items={[
           {

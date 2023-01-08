@@ -2,6 +2,7 @@ import { Component } from 'react';
 import { format, parseISO } from 'date-fns';
 
 import SearchTab from '../searchTab/searchTab';
+import RatedTab from '../ratedTab/ratedTab';
 import AppHeader from '../appHeader/appHeader';
 import MovieAPI from '../../api/movieAPI';
 import ErrorMessages from '../errorMessages/errorMessages';
@@ -18,30 +19,36 @@ export default class App extends Component {
 
   state = {
     filmsData: [],
-    currentPage: [],
+    rated: [],
+    totalPages: 1,
     loading: false,
     isLoaded: false,
     error: false,
     notFound: false,
+    currentTab: 'search',
   };
 
   componentDidMount() {
-    this.searchFilms('marvel');
+    this.api.loadGuestID();
+    if (this.api.myStorage.getItem('ratedFilms')) {
+      this.loadSavedFilms(JSON.parse(this.api.myStorage.getItem('ratedFilms')));
+    }
   }
 
-  onFilmsLoaded(films) {
+  onFilmsLoaded(films, pages) {
     this.setState({
       filmsData: films,
-      currentPage: films.slice(0, 4),
       loading: false,
       isLoaded: true,
       error: false,
       notFound: false,
+      totalPages: pages,
     });
   }
 
   onError = (error) => {
     this.setState({ error: true });
+    // eslint-disable-next-line
     console.log(error);
   };
 
@@ -62,32 +69,16 @@ export default class App extends Component {
     return format(parseISO(date), 'MMMM d, R');
   }
 
-  updateFilms = (page) => {
-    const { filmsData } = this.state;
-    let newState = [];
-    if (page === 1) {
-      newState = filmsData.slice(0, 4);
-    } else if (page === 2) {
-      newState = filmsData.slice(4, 8);
-    } else if (page === 3) {
-      newState = filmsData.slice(8, 12);
-    } else if (page === 4) {
-      newState = filmsData.slice(12, 16);
-    } else if (page === 5) {
-      newState = filmsData.slice(16, 20);
-    }
-    this.setState({ currentPage: newState });
-  };
-
-  searchFilms = (name) => {
+  searchFilms = (name, page) => {
     this.setState({ loading: true });
     this.api
-      .getMovies(name)
+      .getMovies(name, page)
       .then((res) => {
-        if (res.length === 0) {
-          this.setState({ filmsData: [], currentPage: [], loading: false, notFound: true });
+        const { data, totalPages } = res;
+        if (data.length === 0) {
+          this.setState({ filmsData: [], loading: false, notFound: true });
         } else {
-          const newState = res.map((el) => ({
+          const newState = data.map((el) => ({
             id: el.id,
             filmName: el.title,
             releaseDate: App.getFilmDate(el.release_date),
@@ -97,25 +88,116 @@ export default class App extends Component {
             rating: el.vote_average,
             userRating: null,
           }));
-          this.onFilmsLoaded(newState);
+          this.onFilmsLoaded(newState, totalPages);
         }
       })
       .catch(this.onError);
   };
 
+  loadSavedFilms = (films) => {
+    const newState = [];
+
+    films.forEach((el) => {
+      this.api.getFilmByID(el.id).then((res) => {
+        const item = {
+          id: el.id,
+          filmName: res.title,
+          releaseDate: App.getFilmDate(res.release_date),
+          genres: res.genres.map((elem) => elem.name),
+          poster: res.poster_path,
+          description: res.overview,
+          rating: res.vote_average.toFixed(1),
+          userRating: el.rating,
+        };
+        newState.push(item);
+      });
+    });
+    this.setState({ rated: newState });
+  };
+
+  changeTab = (tab) => {
+    this.setState({ currentTab: tab });
+  };
+
+  changeUserRating = (id, rating) => {
+    const { currentTab } = this.state;
+    this.api
+      .changeRating(id, rating)
+      .then((res) => {
+        if (res) {
+          if (currentTab === 'search') {
+            this.setState(({ filmsData }) => {
+              const idx = filmsData.findIndex((el) => el.id === id);
+              const newData = [...filmsData];
+              newData[idx].userRating = rating;
+              this.api.saveUserRating(id, rating);
+              return {
+                filmsData: newData,
+              };
+            });
+          } else {
+            this.setState(({ rated }) => {
+              const idx = rated.findIndex((el) => el.id === id);
+              const newData = [...rated];
+              newData[idx].userRating = rating;
+              this.api.saveUserRating(id, rating);
+              return {
+                rated: newData,
+              };
+            });
+          }
+        }
+      })
+      .then(() => {
+        this.setState(({ rated }) => {
+          this.api.getFilmByID(id).then((res) => {
+            const newRated = [...rated];
+            const item = {
+              id: id,
+              filmName: res.title,
+              releaseDate: App.getFilmDate(res.release_date),
+              genres: res.genres.map((elem) => elem.name),
+              poster: res.poster_path,
+              description: res.overview,
+              rating: res.vote_average.toFixed(1),
+              userRating: rating,
+            };
+            newRated.push(item);
+            return {
+              rated: newRated,
+            };
+          });
+        });
+      });
+  };
+
   render() {
-    const { currentPage, loading, isLoaded, error, notFound } = this.state;
-    return (
-      <section className="main">
-        <ErrorMessages error={error} notFound={notFound} />
-        <AppHeader />
+    const { filmsData, loading, isLoaded, error, notFound, totalPages, currentTab, rated } = this.state;
+    const selectedTab =
+      currentTab === 'search' ? (
         <SearchTab
-          currentPage={currentPage}
+          totalPages={totalPages}
+          filmsData={filmsData}
           loading={loading}
           isLoaded={isLoaded}
+          changeUserRating={this.changeUserRating}
           searchFilms={this.searchFilms}
-          updateFilms={this.updateFilms}
         />
+      ) : (
+        <RatedTab
+          rated={rated}
+          loading={loading}
+          isLoaded={isLoaded}
+          changeUserRating={this.changeUserRating}
+          searchFilms={this.searchFilms}
+        />
+      );
+
+    return (
+      <section className="main">
+        <ErrorMessages error={error} notFound={notFound} changeRating />
+        <AppHeader changeTab={this.changeTab} />
+        {selectedTab}
       </section>
     );
   }
