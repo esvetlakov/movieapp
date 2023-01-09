@@ -15,7 +15,7 @@ export default class RatedTab extends Component {
   };
 
   render() {
-    const { loading, isLoaded, rated, changeUserRating } = this.props;
+    const { loading, rated, changeUserRating } = this.props;
     const { currentPage } = this.state;
     return (
       <div className="ratedTab">
@@ -24,11 +24,12 @@ export default class RatedTab extends Component {
         </Spin>
         <Pagination
           defaultCurrent={1}
+          total={rated.length}
           current={currentPage}
           defaultPageSize={20}
           showSizeChanger={false}
           showQuickJumper
-          className={!isLoaded ? 'hidden' : 'pagination'}
+          className={rated.length > 0 ? 'ratedPagination' : 'hidden'}
           onChange={this.paginationOnChange}
         />
       </div>

@@ -13,7 +13,6 @@ export default function AppHeader(props) {
       <Tabs
         className="tabs"
         defaultActiveKey="1"
-        destroyInactiveTabPane={true}
         onChange={onChange}
         items={[
           {

@@ -62,6 +62,16 @@ export default class App extends Component {
     return names;
   }
 
+  getRatingFromSaved = (id) => {
+    const { rated } = this.state;
+
+    const resID = rated.map((el) => el.id).findIndex((el) => el === id);
+    if (resID !== -1) {
+      return rated[resID].userRating;
+    }
+    return null;
+  };
+
   static getFilmDate(date) {
     if (!date) {
       return 'Release date unknown';
@@ -86,7 +96,7 @@ export default class App extends Component {
             poster: el.poster_path,
             description: el.overview,
             rating: el.vote_average,
-            userRating: null,
+            userRating: this.getRatingFromSaved(el.id),
           }));
           this.onFilmsLoaded(newState, totalPages);
         }
@@ -119,56 +129,71 @@ export default class App extends Component {
     this.setState({ currentTab: tab });
   };
 
-  changeUserRating = (id, rating) => {
+  addToRated = (filmId, rating) => {
+    console.log('called');
+    const { rated } = this.state;
+    const newRated = [...rated];
+    const idx = rated.findIndex((el) => el.id === filmId);
+
+    this.api.getFilmByID(filmId).then((result) => {
+      const item = {
+        id: filmId,
+        filmName: result.title,
+        releaseDate: App.getFilmDate(result.release_date),
+        genres: result.genres.map((elem) => elem.name),
+        poster: result.poster_path,
+        description: result.overview,
+        rating: result.vote_average.toFixed(1),
+        userRating: rating,
+      };
+      if (idx === -1) {
+        newRated.push(item);
+      } else {
+        newRated[idx] = item;
+      }
+      this.setState({ rated: newRated });
+    });
+  };
+
+  changeUserRating = (filmId, rating) => {
     const { currentTab } = this.state;
     this.api
-      .changeRating(id, rating)
+      .changeRating(filmId, rating)
       .then((res) => {
         if (res) {
+          const { rated, filmsData } = this.state;
           if (currentTab === 'search') {
-            this.setState(({ filmsData }) => {
-              const idx = filmsData.findIndex((el) => el.id === id);
+            this.setState(() => {
+              const idx = filmsData.findIndex((el) => el.id === filmId);
               const newData = [...filmsData];
               newData[idx].userRating = rating;
-              this.api.saveUserRating(id, rating);
+              this.api.saveUserRating(filmId, rating);
               return {
                 filmsData: newData,
               };
             });
+            this.addToRated(filmId, rating);
           } else {
-            this.setState(({ rated }) => {
-              const idx = rated.findIndex((el) => el.id === id);
+            const filmsDataArr = [...filmsData];
+            this.setState(() => {
+              const ratedIdx = rated.findIndex((el) => el.id === filmId);
+              const check = filmsDataArr.map((item) => item.id).includes(filmId);
+              if (check) {
+                const idx = filmsDataArr.map((el) => el.id).findIndex((el) => el === filmId);
+                filmsDataArr[idx].userRating = rating;
+              }
               const newData = [...rated];
-              newData[idx].userRating = rating;
-              this.api.saveUserRating(id, rating);
+              newData[ratedIdx].userRating = rating;
+              this.api.saveUserRating(filmId, rating);
               return {
+                filmsData: filmsDataArr,
                 rated: newData,
               };
             });
           }
         }
       })
-      .then(() => {
-        this.setState(({ rated }) => {
-          this.api.getFilmByID(id).then((res) => {
-            const newRated = [...rated];
-            const item = {
-              id: id,
-              filmName: res.title,
-              releaseDate: App.getFilmDate(res.release_date),
-              genres: res.genres.map((elem) => elem.name),
-              poster: res.poster_path,
-              description: res.overview,
-              rating: res.vote_average.toFixed(1),
-              userRating: rating,
-            };
-            newRated.push(item);
-            return {
-              rated: newRated,
-            };
-          });
-        });
-      });
+      .catch(() => this.onError);
   };
 
   render() {
@@ -184,13 +209,7 @@ export default class App extends Component {
           searchFilms={this.searchFilms}
         />
       ) : (
-        <RatedTab
-          rated={rated}
-          loading={loading}
-          isLoaded={isLoaded}
-          changeUserRating={this.changeUserRating}
-          searchFilms={this.searchFilms}
-        />
+        <RatedTab rated={rated} loading={loading} isLoaded={isLoaded} changeUserRating={this.changeUserRating} />
       );
 
     return (

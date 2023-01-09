@@ -5,8 +5,9 @@
     background-color: white;
 }
 
-.pagination {
+.ratedPagination {
     margin-bottom: 20px;
+    align-self: center;
 }
 
 .hidden {

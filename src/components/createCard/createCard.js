@@ -74,7 +74,7 @@ export default function CreateCard(props) {
             ellipsis={
               (true,
               {
-                rows: 5,
+                rows: genres.length > 3 ? 3 : 4,
               })
             }
           >
