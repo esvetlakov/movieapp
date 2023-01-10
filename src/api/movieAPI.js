@@ -38,19 +38,20 @@ export default class movieAPI {
         guestSession.id = res.guest_session_id;
         guestSession.expires = Date.parse(res.expires_at);
         this.myStorage.setItem('guestSession', JSON.stringify(guestSession));
+        this.guest = res.guest_session_id;
       })
       // eslint-disable-next-line
       .catch((err) => console.log(err));
   }
 
   async loadGuestID() {
+    let guestSession;
     if (this.myStorage.getItem('guestSession') === null) {
       await this.generateGuestSession();
     } else {
-      let guestSession = JSON.parse(this.myStorage.getItem('guestSession'));
+      guestSession = JSON.parse(this.myStorage.getItem('guestSession'));
       if (guestSession.expires < Date.now()) {
         await this.generateGuestSession();
-        guestSession = JSON.parse(this.myStorage.getItem('guestSession'));
       }
       this.guest = guestSession.id;
     }
