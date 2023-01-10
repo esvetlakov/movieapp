@@ -76,7 +76,8 @@
 }
 
 .ant-tag {
-    margin-inline-end: 2px;
+    -webkit-margin-end: 2px;
+            margin-inline-end: 2px;
 }
 
 .description {
@@ -94,5 +95,6 @@
 }
 
 .ant-rate-star {
-    margin-inline-end: 4px !important;
+    -webkit-margin-end: 4px !important;
+            margin-inline-end: 4px !important;
 }
