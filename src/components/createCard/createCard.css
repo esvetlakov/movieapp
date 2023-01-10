@@ -26,15 +26,9 @@
     justify-content: center;
 }
 
-.poster {
-    width: 100%;
-    height: 100%;
-}
-
 .cardInfo {
     width: 268px !important;
-    margin: 10px 10px 15px 20px;
-    overflow: hidden;
+    padding: 10px 10px 15px 20px;
     background-color: inherit;
 }
 
@@ -113,9 +107,13 @@
         background-color: #FFFFFF;
     }
 
+    .cardInfo {
+        padding: 10px 10px 15px 10px;
+    }
+
     .userRating {
         margin-top: auto;
         line-height: 18px !important;
-        font-size: 17px;
+        font-size: 15px;
     }
 }
