@@ -80,7 +80,7 @@ export default class App extends Component {
   }
 
   searchFilms = (name, page) => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: false, notFound: false });
     this.api
       .getMovies(name, page)
       .then((res) => {

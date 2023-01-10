@@ -8,6 +8,7 @@
 .input {
     margin: 10px 50px 35px 50px;
     width: calc(100% - 100px);
+    max-width: 950px;
 }
 
 .pagination {
@@ -16,4 +17,11 @@
 
 .hidden {
     display: none;
+}
+
+@media screen and (max-width: 1279.98px) {
+    .input {
+        margin: 10px 25px 35px 25px;
+        width: calc(100% - 50px);
+    }
 }
