@@ -9,6 +9,7 @@ export default class RatedTab extends Component {
     currentPage: 1,
   };
 
+  // eslint-disable-next-line
   paginationOnChange = (page) => {
     console.log(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
