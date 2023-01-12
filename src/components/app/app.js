@@ -80,7 +80,7 @@ export default class App extends Component {
   }
 
   searchFilms = (name, page) => {
-    this.setState({ loading: true });
+    this.setState({ loading: true, error: false, notFound: false });
     this.api
       .getMovies(name, page)
       .then((res) => {
@@ -106,7 +106,6 @@ export default class App extends Component {
 
   loadSavedFilms = (films) => {
     const newState = [];
-
     films.forEach((el) => {
       this.api.getFilmByID(el.id).then((res) => {
         const item = {
@@ -130,7 +129,6 @@ export default class App extends Component {
   };
 
   addToRated = (filmId, rating) => {
-    console.log('called');
     const { rated } = this.state;
     const newRated = [...rated];
     const idx = rated.findIndex((el) => el.id === filmId);
