@@ -56,7 +56,7 @@ export default class SearchTab extends Component {
         <Pagination
           defaultCurrent={1}
           current={currentPage}
-          total={totalPages}
+          total={totalPages * 20}
           defaultPageSize={20}
           showSizeChanger={false}
           showQuickJumper

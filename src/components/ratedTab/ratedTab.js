@@ -9,14 +9,19 @@ export default class RatedTab extends Component {
     currentPage: 1,
   };
 
-  // eslint-disable-next-line
+  componentDidMount() {
+    const { loadRatedFilms } = this.props;
+    loadRatedFilms();
+  }
+
   paginationOnChange = (page) => {
-    console.log(page);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    const { loadRatedFilms } = this.props;
+    loadRatedFilms(page);
+    this.setState({ currentPage: page });
   };
 
   render() {
-    const { loading, rated, changeUserRating } = this.props;
+    const { loading, rated, changeUserRating, ratedTotalPages } = this.props;
     const { currentPage } = this.state;
     return (
       <div className="ratedTab">
@@ -25,12 +30,12 @@ export default class RatedTab extends Component {
         </Spin>
         <Pagination
           defaultCurrent={1}
-          total={rated.length}
           current={currentPage}
+          total={ratedTotalPages * 20}
           defaultPageSize={20}
           showSizeChanger={false}
           showQuickJumper
-          className={rated.length > 0 ? 'ratedPagination' : 'hidden'}
+          className="ratedPagination"
           onChange={this.paginationOnChange}
         />
       </div>
