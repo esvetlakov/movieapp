@@ -27,7 +27,6 @@ export default class movieAPI {
       data: res.results,
       totalPages: res.total_pages,
     };
-
     return result;
   }
 
@@ -73,42 +72,18 @@ export default class movieAPI {
     return res.ok;
   }
 
-  saveUserRating(filmId, userRating) {
-    const film = {
-      id: filmId,
-      rating: userRating,
+  async getRatedFilms(page = 1) {
+    const res = await this.getResource(`/guest_session/${this.guest}/rated/movies?api_key=${this.key}&page=${page}`);
+    const result = {
+      films: res.results,
+      ratedPages: res.total_pages,
     };
-
-    let ratedFilms = [];
-
-    if (this.myStorage.getItem('ratedFilms') === null) {
-      ratedFilms.push(film);
-      this.myStorage.setItem('ratedFilms', JSON.stringify(ratedFilms));
-    } else {
-      ratedFilms = JSON.parse(this.myStorage.getItem('ratedFilms'));
-      let idx = null;
-
-      ratedFilms.forEach((el, index) => {
-        if (el.id === film.id) idx = index;
-      });
-
-      if (idx !== null) {
-        ratedFilms[idx].id = film.id;
-        ratedFilms[idx].rating = film.rating;
-      } else {
-        ratedFilms.push(film);
-      }
-      this.myStorage.setItem('ratedFilms', JSON.stringify(ratedFilms));
-    }
+    return result;
   }
 
   async getFilmByID(id) {
     const res = await this.getResource(`movie/${id}?api_key=${this.key}&language=en-US`);
     return res;
-  }
-
-  getMovieData(id) {
-    return this.getResource(`search/movie/${id}`);
   }
 
   async getGenres() {
