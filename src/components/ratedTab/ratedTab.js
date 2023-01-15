@@ -1,7 +1,7 @@
 import { Pagination, Spin } from 'antd';
 import { Component } from 'react';
 
-import CreateCard from '../createCard/createCard';
+import MovieCard from '../movieCard/movieCard';
 import './ratedTab.css';
 
 export default class RatedTab extends Component {
@@ -20,14 +20,19 @@ export default class RatedTab extends Component {
     this.setState({ currentPage: page });
   };
 
+  createFilmList() {
+    const { rated, changeUserRating } = this.props;
+    const list = rated.map((film) => <MovieCard film={film} changeUserRating={changeUserRating} key={film.id} />);
+    return <div className="cards">{list}</div>;
+  }
+
   render() {
-    const { loading, rated, changeUserRating, ratedTotalPages } = this.props;
+    const { loading, ratedTotalPages } = this.props;
     const { currentPage } = this.state;
+    const list = this.createFilmList();
     return (
       <div className="ratedTab">
-        <Spin spinning={loading}>
-          <CreateCard filmsData={rated} changeUserRating={changeUserRating} />
-        </Spin>
+        <Spin spinning={loading}>{list}</Spin>
         <Pagination
           defaultCurrent={1}
           current={currentPage}

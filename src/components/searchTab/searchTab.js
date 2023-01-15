@@ -1,7 +1,7 @@
 import { Input, Pagination, Spin } from 'antd';
 import { Component } from 'react';
 
-import CreateCard from '../createCard/createCard';
+import MovieCard from '../movieCard/movieCard';
 import './searchTab.css';
 
 export default class SearchTab extends Component {
@@ -44,15 +44,19 @@ export default class SearchTab extends Component {
     }
   };
 
+  createFilmList() {
+    const { filmsData, changeUserRating } = this.props;
+    const list = filmsData.map((film) => <MovieCard film={film} changeUserRating={changeUserRating} key={film.id} />);
+    return <div className="cards">{list}</div>;
+  }
+
   render() {
-    const { loading, isLoaded, totalPages, filmsData, changeUserRating } = this.props;
+    const { loading, isLoaded, totalPages } = this.props;
     const { currentPage } = this.state;
     return (
       <div className="searchTab">
         <Input placeholder="Type to search" className="input" onChange={SearchTab.debounce(this.inputOnChange)} />
-        <Spin spinning={loading}>
-          <CreateCard filmsData={filmsData} changeUserRating={changeUserRating} />
-        </Spin>
+        <Spin spinning={loading}>{this.createFilmList()}</Spin>
         <Pagination
           defaultCurrent={1}
           current={currentPage}
