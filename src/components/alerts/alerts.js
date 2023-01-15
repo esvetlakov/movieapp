@@ -35,5 +35,17 @@ export default function Alerts(props) {
     if (status === 'success') {
       return <Alert message="Rating successfully changed" type="success" closable className="alert" />;
     }
+    if (status === 'err') {
+      return (
+        <Alert
+          message="Unknown Error!"
+          description="Unknown error occurred, please reload the page"
+          type="error"
+          showIcon
+          closable
+          className="alert"
+        />
+      );
+    }
   }
 }

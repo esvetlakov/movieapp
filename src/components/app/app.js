@@ -1,5 +1,6 @@
 import { Component } from 'react';
 import { format, parseISO } from 'date-fns';
+import { Result } from 'antd';
 
 import SearchTab from '../searchTab/searchTab';
 import RatedTab from '../ratedTab/ratedTab';
@@ -26,10 +27,15 @@ export default class App extends Component {
     isLoaded: false,
     alert: null,
     currentTab: 'search',
+    hasError: false,
   };
 
   componentDidMount() {
     this.api.loadGuestID();
+  }
+
+  componentDidCatch() {
+    this.setState({ hasError: true });
   }
 
   onError = (err) => {
@@ -126,7 +132,8 @@ export default class App extends Component {
   };
 
   render() {
-    const { filmsData, loading, isLoaded, alert, searchTotalPages, currentTab, rated, ratedTotalPages } = this.state;
+    const { filmsData, loading, isLoaded, alert, searchTotalPages, currentTab, rated, ratedTotalPages, hasError } =
+      this.state;
     const selectedTab =
       currentTab === 'search' ? (
         <SearchTab
@@ -147,6 +154,10 @@ export default class App extends Component {
           changeUserRating={this.changeUserRating}
         />
       );
+
+    if (hasError) {
+      return <Result status="500" title="500" subTitle="Sorry, something went wrong." />;
+    }
 
     return (
       <section className="main">
