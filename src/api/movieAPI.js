@@ -32,6 +32,7 @@ export default class movieAPI {
 
   async generateGuestSession() {
     const guestSession = {};
+    this.myStorage.clear();
     await this.getResource(`authentication/guest_session/new?api_key=${this.key}`)
       .then((res) => {
         guestSession.id = res.guest_session_id;

@@ -21,7 +21,7 @@ export default class RatedTab extends Component {
   };
 
   createFilmList() {
-    const { rated, changeUserRating } = this.props;
+    const { changeUserRating, rated } = this.props;
     const list = rated.map((film) => <MovieCard film={film} changeUserRating={changeUserRating} key={film.id} />);
     return <div className="cards">{list}</div>;
   }
@@ -29,10 +29,9 @@ export default class RatedTab extends Component {
   render() {
     const { loading, ratedTotalPages } = this.props;
     const { currentPage } = this.state;
-    const list = this.createFilmList();
     return (
       <div className="ratedTab">
-        <Spin spinning={loading}>{list}</Spin>
+        <Spin spinning={loading}>{this.createFilmList()}</Spin>
         <Pagination
           defaultCurrent={1}
           current={currentPage}

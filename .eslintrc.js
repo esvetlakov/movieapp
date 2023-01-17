@@ -25,6 +25,7 @@ module.exports = {
     'linebreak-style': [0, 'unix'],
     'import/no-extraneous-dependencies': ['error', { devDependencies: true }],
     quotes: ['error', 'single'],
+    'no-param-reassign': ['error', { props: false }],
     'react/react-in-jsx-scope': 'off',
     'react/jsx-props-no-spreading': 'off',
     'jsx-a11y/label-has-associated-control': 0,

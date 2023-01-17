@@ -11,12 +11,7 @@ import Alerts from '../alerts/alerts';
 export default class App extends Component {
   api = new MovieAPI();
 
-  genresList = this.api.getGenres().then((res) => {
-    this.genresList = new Map();
-    res.forEach((el) => {
-      this.genresList.set(el.id, el.name);
-    });
-  });
+  genresList = new Map();
 
   state = {
     filmsData: [],
@@ -32,6 +27,11 @@ export default class App extends Component {
 
   componentDidMount() {
     this.api.loadGuestID();
+    this.api.getGenres().then((res) => {
+      res.forEach((el) => {
+        this.genresList.set(el.id, el.name);
+      });
+    });
   }
 
   componentDidCatch() {
@@ -79,7 +79,7 @@ export default class App extends Component {
               poster: el.poster_path,
               description: el.overview,
               rating: el.vote_average,
-              userRating: null,
+              userRating: Number(this.api.myStorage.getItem(el.id)),
             }));
             this.setState({
               filmsData: newState,
@@ -95,10 +95,11 @@ export default class App extends Component {
   };
 
   loadRatedFilms = (page) => {
+    let ratedFilms;
     this.setState({ loading: true, alert: null });
     this.api.getRatedFilms(page).then((res) => {
       const { films, ratedPages } = res;
-      const ratedFilms = films.map((el) => ({
+      ratedFilms = films.map((el) => ({
         id: el.id,
         filmName: el.title,
         releaseDate: App.getFilmDate(el.release_date),
@@ -126,7 +127,13 @@ export default class App extends Component {
     this.setState({ alert: null });
     this.api.changeRating(filmId, rating).then((res) => {
       if (res) {
-        this.setState({ alert: { status: 'success' } });
+        const { filmsData } = this.state;
+        const newData = JSON.parse(JSON.stringify(filmsData));
+        newData.forEach((el) => {
+          if (el.id === filmId) el.userRating = rating;
+        });
+        this.setState({ alert: { status: 'success' }, filmsData: newData });
+        this.api.myStorage.setItem(filmId, rating);
       }
     });
   };
